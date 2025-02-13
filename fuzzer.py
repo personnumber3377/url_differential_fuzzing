@@ -1,11 +1,51 @@
 import json
 import subprocess
-import urllib.parse
 import validators
 
+import sys
 
+import atheris
+
+with atheris.instrument_imports():
+    import urllib.parse
 
 '''
+
+
+
+
+import sys
+
+import atheris
+
+with atheris.instrument_imports():
+    import fuzzers
+
+
+def TestOneInput(data):
+    fdp = atheris.FuzzedDataProvider(data)
+    choice = fdp.ConsumeIntInRange(0, len(fuzzers.tests) - 1)
+    func, data_type = fuzzers.tests[choice]
+
+    if data_type == str:
+        data = fdp.ConsumeUnicodeNoSurrogates(sys.maxsize)
+    elif data_type == bytes:
+        data = fdp.ConsumeBytes(sys.maxsize)
+    elif data_type == int:
+        data = fdp.ConsumeInt(sys.maxsize)
+
+    try:
+        func(data)
+    except Exception:
+        print(func, data_type, repr(data))
+        raise
+
+
+atheris.Setup(sys.argv, TestOneInput)
+atheris.Fuzz()
+
+
+
 return {
     "valid": True,
     "scheme": parsed.scheme,
@@ -110,6 +150,14 @@ def compare_parsers(url):
         assert False
     print("-" * 50)
 
+
+
+
+
+
+
+
+'''
 # List of test URLs
 test_urls = [
     "https://example.com",
@@ -124,3 +172,19 @@ test_urls = [
 # Run comparisons
 for url in test_urls:
     compare_parsers(url)
+'''
+
+# compare_parsers
+
+def TestOneInput(data):
+    try:
+        data = data.decode("utf-8")
+    except:
+        return
+    compare_parsers(data)
+    return
+
+
+atheris.Setup(sys.argv, TestOneInput)
+atheris.Fuzz()
+
